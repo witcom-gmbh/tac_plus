@@ -1,0 +1,42 @@
+FROM alpine:3.14 as build
+
+LABEL Name=tac_plus
+LABEL Version=1.3.0
+
+ARG SRC_VERSION
+
+ADD https://www.pro-bono-publico.de/projects/archive/DEVEL.$SRC_VERSION.tar.bz2 /event_driven_servers.tar.bz2
+ADD https://www.pro-bono-publico.de/projects/archive/DEVEL.$SRC_VERSION.tar.bz2.sha256 /src_hash.sha256
+
+RUN echo "$(cat src_hash.sha256)  event_driven_servers.tar.bz2" | sha256sum -c
+
+RUN apk update && \
+    apk add build-base bzip2 perl perl-digest-md5 perl-ldap perl-io-socket-ssl pcre2-dev bash && \
+    tar -xzjf event_driven_servers.tar.bz2 && \
+    cd PROJECTS && \
+    ./configure --prefix=/tacacs && \
+    env SHELL=/bin/bash make && \
+    env SHELL=/bin/bash make install
+
+# Move to a clean, small image
+FROM alpine:3.14
+
+LABEL maintainer="Carsten Buchberger <c.buchberger@witcom.de>"
+
+ENV TAC_PLUS_BIN=/tacacs/sbin/tac_plus
+ENV CONF_FILE=/etc/tac_plus/tac_plus.cfg
+
+COPY --from=build /tacacs /tacacs
+
+COPY tac_base.cfg $CONF_FILE
+COPY tac_user.cfg /etc/tac_plus/tac_user.cfg
+
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+RUN apk update && \
+    apk add perl-digest-md5 perl-ldap perl perl-io-socket-ssl pcre2-dev && \
+    rm -rf /var/cache/apk/*
+
+EXPOSE 49
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
