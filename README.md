@@ -22,7 +22,7 @@ DOCKER_HUB_NAME=my-custom-repo/noc/tac_plus make all
 ```
 
 ## Configuration
-Configuration is stored in two files `tac_base.cfg` and `tac_user.cfg`. tac_base.cfg contains the basic, more or less statc configurations. 
+Configuration is stored in two files `tac_plus.cfg` and `tac_user.cfg`. tac_plus.cfg contains the basic, more or less statc configurations. 
 
 If additional users or parameters are required, the `tac_user.cfg` file should be modified and passed into the container via a docker volume using `-v /path/to/tac_user.cfg:/etc/tac_plus/tac_user.cfg`
 
@@ -36,6 +36,12 @@ Example - Running the default container for a quick test and inspecting the logs
 ```
 docker run -it --rm -p 49:49 -v /local/base.cfg:/etc/tac_plus/tac_plus.cfg -v /local/user.cfg:/etc/tac_plus/tac_user.cfg tac_plus
 ```  
+
+### Ansible
+
+See `https://github.com/witcom-gmbh/ansible-network-aaa-collection/tree/main/roles/tac_plus`
+
+
 
 ### Docker compose
 

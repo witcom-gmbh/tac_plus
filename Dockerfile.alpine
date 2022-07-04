@@ -28,7 +28,7 @@ ENV CONF_FILE=/etc/tac_plus/tac_plus.cfg
 
 COPY --from=build /tacacs /tacacs
 
-COPY tac_base.cfg $CONF_FILE
+COPY tac_plus.cfg $CONF_FILE
 COPY tac_user.cfg /etc/tac_plus/tac_user.cfg
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
